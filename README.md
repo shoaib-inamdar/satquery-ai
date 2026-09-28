@@ -1,18 +1,19 @@
 # SatQuery AI
 
-**An agentic vision-language assistant for multimodal remote-sensing image analysis through text queries.**
+> **An agentic vision-language assistant for multimodal remote-sensing image analysis through text queries.**
 
-Smart India Hackathon 2026 · ISRO / Space Applications Centre · Problem Statement **26167** · Theme: Space Technology · Category: Software
+**Smart India Hackathon 2026** · ISRO / Space Applications Centre<br>
+Problem Statement **26167** · Theme: Space Technology · Category: Software
 
-Team: `[team name]` · Team ID: `[id]` · Members: `[names]`
+
 
 ---
 
 ## 1. What this project does
 
-You upload one or two satellite images, type a question in plain English, and SatQuery AI works out which analysis to run, runs it, and returns an answer with visual evidence, a confidence score and a log of exactly what happened.
+> Upload one or two satellite images, ask a question in plain English, and SatQuery AI selects the analysis, runs it, and returns an answer with visual evidence, confidence and an auditable execution log.
 
-Examples:
+### Example queries
 
 | Query | Inputs | What runs |
 |---|---|---|
@@ -30,48 +31,45 @@ A general-purpose LLM or VLM is also not enough. Published benchmarks show that 
 
 ## 3. Features
 
-- Single-image VQA, captioning and text-guided region grounding
-- Bi-temporal change analysis with change description, change-based VQA and a spatial change map
-- Optical–SAR cross-modal analysis with an agreement map (confirmed by both, optical-only, SAR-only)
-- Agentic controller: reads the query, checks the inputs, picks tools from a registry, sets only permitted parameters
-- Input compatibility checking (modality, format, CRS, overlap, resolution)
-- Evidence for every answer: overlays, GeoJSON, measurements with IDs
-- Computed confidence with a visible breakdown
-- Auditable execution trace (task, router, tools, parameters, timings)
-- Downloadable report (PDF, JSON, GeoJSON)
-- Preset workflows: flood extent and land-disturbance candidates (for human review)
-- Follow-up chat limited to the evidence already computed
-- Benchmarks page that shows only measured results
+- **Single-image analysis:** VQA, captioning and text-guided region grounding
+- **Bi-temporal analysis:** change description, change-based VQA and spatial change maps
+- **Optical–SAR fusion:** agreement maps showing confirmed, optical-only and SAR-only regions
+- **Agentic controller:** reads the query, checks inputs, selects registry tools and sets permitted parameters
+- **Compatibility checks:** modality, format, CRS, overlap and resolution
+- **Evidence-first answers:** overlays, GeoJSON and measurements with stable IDs
+- **Confidence and traceability:** visible confidence breakdown plus task, router, tool, parameter and timing logs
+- **Reports and workflows:** PDF, JSON and GeoJSON exports, plus flood and land-disturbance candidates for human review
+- **Evidence-bounded follow-up chat** and a benchmarks page showing only measured results
 
 ## 4. Architecture
 
 ```mermaid
 flowchart TD
-    A[User query + image(s)] --> B[Ingestion and compatibility check]
-    B -->|fail| X[Refuse with reason]
-    B -->|pass| C[Agentic controller / task router]
-    C --> D{Task}
-    D -->|vqa / caption| E[Single-image tools]
-    D -->|grounding| F[Text-guided grounding]
-    D -->|change| G[Bi-temporal change tools]
-    D -->|fusion| H[Optical-SAR fusion]
-    D -->|flood / disturbance| I[Preset workflows]
-    E --> J[Evidence integration]
+    A["User query + image(s)"] --> B["Ingestion and compatibility check"]
+    B -->|fail| X["Refuse with reason"]
+    B -->|pass| C["Agentic controller / task router"]
+    C --> D{"Task"}
+    D -->|vqa / caption| E["Single-image tools"]
+    D -->|grounding| F["Text-guided grounding"]
+    D -->|change| G["Bi-temporal change tools"]
+    D -->|fusion| H["Optical-SAR fusion"]
+    D -->|flood / disturbance| I["Preset workflows"]
+    E --> J["Evidence integration"]
     F --> J
     G --> J
     H --> J
     I --> J
-    J --> K[Confidence + execution trace]
-    K --> L[Answer + overlays + report]
+    J --> K["Confidence + execution trace"]
+    K --> L["Answer + overlays + report"]
 ```
 
-Three layers:
+### Three layers
 
 1. **Perception**: remote-sensing-adapted vision-language model plus measured scene statistics.
 2. **Specialists**: VQA, captioning, grounding, change analysis, fusion.
 3. **Orchestration**: controller that routes, sequences, integrates and logs.
 
-**Evidence-first principle:** numbers in an answer come from measured pixels or model outputs stored in an evidence bundle. The language layer can rephrase, but any number that is not in the bundle is rejected.
+> **Evidence-first principle:** numbers in an answer come from measured pixels or model outputs stored in an evidence bundle. The language layer can rephrase, but any number that is not in the bundle is rejected.
 
 ## 5. Tech stack and why
 
@@ -136,30 +134,34 @@ Update this table to match what the code really does before every demo.
 
 | Capability | Status | Notes |
 |---|---|---|
-| GeoTIFF/TIFF ingestion, modality detection, compatibility check | Implemented | rasterio |
-| Optical/SAR preprocessing, co-registration | Implemented | Reprojection on georeferenced data; ORB/RANSAC fallback for non-georeferenced benchmark images |
-| Grounding (water, built-up, vegetation, and so on) | Classical-CV baseline | Spectral indices / SAR thresholding, not a learned model |
-| Change map, transition matrix, change-VQA | Classical-CV baseline | CDVQA is our reference design; its network is not reproduced |
-| Optical–SAR fusion | Rule-based baseline | Agreement of optical and SAR masks |
-| VQA / captioning | Real VLM + measured evidence | Small open VLM; numbers come from measurements |
+| GeoTIFF/TIFF ingestion, modality detection, compatibility check | **Implemented** | rasterio |
+| Optical/SAR preprocessing, co-registration | **Implemented** | Reprojection on georeferenced data; ORB/RANSAC fallback for non-georeferenced benchmark images |
+| Grounding (water, built-up, vegetation, and so on) | **Classical-CV baseline** | Spectral indices / SAR thresholding, not a learned model |
+| Change map, transition matrix, change-VQA | **Classical-CV baseline** | CDVQA is our reference design; its network is not reproduced |
+| Optical–SAR fusion | **Rule-based baseline** | Agreement of optical and SAR masks |
+| VQA / captioning | **Real VLM + measured evidence** | Small open VLM; numbers come from measurements |
 | Remote-sensing adaptation (LoRA on BigEarthNet) | Script provided; **adapter only counts if trained** | The UI shows "NOT adapted" until an adapter exists |
-| Agentic router | Laya + rule-based fallback | UI shows which one decided |
-| Report (PDF/JSON/GeoJSON) | Implemented | |
-| Flood extent / land-disturbance candidates | Preset workflows | Candidates for human review only |
+| Agentic router | **Laya + rule-based fallback** | UI shows which one decided |
+| Report (PDF/JSON/GeoJSON) | **Implemented** | |
+| Flood extent / land-disturbance candidates | **Preset workflows** | Candidates for human review only |
 | Benchmark results | **Not run unless you run the eval scripts** | `results/` starts empty |
 | Evaluation on ISRO/SAC data | Not possible | Data is withheld |
 
 ## 8. Quick start
 
+### Backend
+
 ```bash
-# backend
 cd backend
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python ../scripts/make_synthetic_samples.py             # creates SYNTHETIC demo data
 uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
 
-# frontend (new terminal)
+### Frontend
+
+```bash
 cd frontend
 npm install
 npm run dev -- --host 127.0.0.1 --port 5173
@@ -167,7 +169,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 Open `http://127.0.0.1:5173`, press **Launch Live Demo**, pick a sample or upload your own GeoTIFF.
 
-Optional adaptation and evaluation:
+### Optional adaptation and evaluation
 
 ```bash
 python train/build_vqa_from_bigearthnet.py --bigearthnet /path/to/BigEarthNet-MM --subset 5000
@@ -177,11 +179,15 @@ python scripts/eval_rsvqa.py    --data /path/to/RSVQA_test
 python scripts/eval_cdvqa.py    --data /path/to/CDVQA_test
 ```
 
-Tests: `cd backend && pytest`
+### Tests
+
+```bash
+cd backend && pytest
+```
 
 ## 9. API
 
-```
+```http
 GET  /api/health
 GET  /api/status
 GET  /api/samples
@@ -217,7 +223,3 @@ See the tree in `ANTIGRAVITY_PROMPT.md` section 2 (`backend/`, `frontend/`, `tra
 ## 13. Acknowledgements and data licences
 
 Copernicus Sentinel data (open access), NASA Earth Observatory imagery (public domain), BigEarthNet, RSVQA, VRSBench, CDVQA, Laya. Check each dataset's licence before redistributing.
-
-## 14. Licence
-
-`[choose a licence, e.g. MIT]`
