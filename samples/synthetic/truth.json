@@ -1,0 +1,41 @@
+{
+  "edits": [
+    {
+      "type": "vegetation_to_bare_soil",
+      "rows": [
+        80,
+        120
+      ],
+      "cols": [
+        64,
+        104
+      ],
+      "description": "Clearing: vegetation \u2192 bare soil"
+    },
+    {
+      "type": "vegetation_to_builtup",
+      "rows": [
+        140,
+        176
+      ],
+      "cols": [
+        150,
+        192
+      ],
+      "description": "New built-up block"
+    },
+    {
+      "type": "soil_to_water",
+      "rows": [
+        64,
+        80
+      ],
+      "cols": [
+        0,
+        80
+      ],
+      "description": "Reservoir extension"
+    }
+  ],
+  "note": "SYNTHETIC ground truth for change-detection validation"
+}
